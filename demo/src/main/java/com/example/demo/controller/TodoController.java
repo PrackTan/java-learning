@@ -11,15 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
 import com.example.demo.entity.Todo;
-import com.example.demo.service.TodoService;
+import com.example.demo.service.impl.TodoServiceImpl;
 
 
 @RestController
 @RequestMapping("/todos")
 public class TodoController {
     @Autowired
-    private final TodoService todoService;
-    public TodoController(TodoService todoService) {
+    private final TodoServiceImpl todoService;
+    public TodoController(TodoServiceImpl todoService) {
         this.todoService = todoService;
     }
     @GetMapping
@@ -29,8 +29,7 @@ public class TodoController {
         return ResponseEntity.ok("Hello World todos");
     }
     @GetMapping("/create")
-    public ResponseEntity<Todo> createTodo() {
-        Todo todo = new Todo("learn java", "learn java by HOIDANIT", false);
+    public ResponseEntity<Todo> createTodo( Todo todo) {
         this.todoService.creatTodo(todo);
         return ResponseEntity.ok().body(todo);
     }
@@ -42,7 +41,6 @@ public class TodoController {
     public String getTodoById(@PathVariable Long id) {
         this.todoService.getTodoById(id);
         return "Todo found";
-
     }
     @GetMapping("/title/{title}")
     public String getTodobyTitle(@PathVariable String title) {

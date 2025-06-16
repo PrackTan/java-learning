@@ -13,6 +13,7 @@ public class Todo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "title")
+    @NotBlank(message = "Title is required")
     private String title;
     @Column(name = "description")
     private String description;

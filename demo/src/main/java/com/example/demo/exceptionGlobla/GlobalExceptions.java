@@ -1,9 +1,13 @@
 package com.example.demo.exceptionGlobla;
 
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -18,5 +22,12 @@ public class GlobalExceptions {
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<ApiResponse<?>> handleException(NoSuchElementException e){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<String>(HttpStatus.NOT_FOUND, "User not found", e.getMessage(), null));
+    }
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse<?>> handleException(MethodArgumentNotValidException exmethod){
+        List<String> errors = exmethod.getBindingResult().getFieldErrors().stream()
+                            .map(FieldError::getDefaultMessage).collect(Collectors.toList());
+        ApiResponse<List<String>> response = new ApiResponse<List<String>>(HttpStatus.BAD_REQUEST, "Validation error", errors, null);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 }

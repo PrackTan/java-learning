@@ -30,7 +30,7 @@ public class UserController {
     public UserController(UserService userService) {
         this.userService = userService;
     }
-    @GetMapping("/users")
+    @GetMapping("/user")
     public ResponseEntity<ApiResponse<List<User>>> getUsers(){
         List<User> users = userService.getAllUsers();
         var response = new ApiResponse<List<User>>(HttpStatus.OK, "Users fetched successfully", users, null);

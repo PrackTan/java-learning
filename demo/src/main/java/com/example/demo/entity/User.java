@@ -5,7 +5,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import jakarta.persistence.Column;
 
 @Entity
@@ -19,8 +21,11 @@ public class User {
     private String name;
     @Column(name = "email")
     @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email address")
     private String email;
     @Column(name = "password")
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
 
     

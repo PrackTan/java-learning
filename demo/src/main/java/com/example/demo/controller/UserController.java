@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.DTO.Reponse.UserReponse;
+import com.example.demo.DTO.Request.UserRequest;
 import com.example.demo.entity.ApiResponse;
 import com.example.demo.entity.User;
 import com.example.demo.service.UserService;
@@ -31,27 +33,27 @@ public class UserController {
         this.userService = userService;
     }
     @GetMapping("/user")
-    public ResponseEntity<ApiResponse<List<User>>> getUsers(){
-        List<User> users = userService.getAllUsers();
-        var response = new ApiResponse<List<User>>(HttpStatus.OK, "Users fetched successfully", users, null);
+    public ResponseEntity<ApiResponse<List<UserReponse>>> getUsers(){
+        List<UserReponse> users = userService.getAllUsers();
+        var response = new ApiResponse<List<UserReponse>>(HttpStatus.OK, "Users fetched successfully", users, null);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
     @GetMapping("/users/{id}")
-    public ResponseEntity<ApiResponse<User>> getUserById(@PathVariable Long id){
+    public ResponseEntity<ApiResponse<UserReponse>> getUserById(@PathVariable Long id){
         return userService.getUserById(id).map(user -> {
-            var response = new ApiResponse<User>(HttpStatus.OK, "User found successfully", user, null);
+            var response = new ApiResponse<UserReponse>(HttpStatus.OK, "User found successfully", user, null);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }).orElse(ResponseEntity.notFound().build());
     }
     @PostMapping("/users")
-    public ResponseEntity<ApiResponse<User>> createUser(@Valid @RequestBody User user) throws Exception{
-        User newUser = userService.createUser(user);
+    public ResponseEntity<ApiResponse<User>> createUser(@Valid @RequestBody UserRequest userRequest) throws Exception{
+        User newUser = userService.createUser(userRequest);
         var response = new ApiResponse<User>(HttpStatus.CREATED, "User created successfully", newUser, null);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     @PutMapping("/users/{id}")
-    public ResponseEntity<ApiResponse<User>> updateUser(@PathVariable Long id, @RequestBody User user){
-        User updatedUser = userService.updateUser(id, user);
+    public ResponseEntity<ApiResponse<User>> updateUser(@PathVariable Long id, @RequestBody UserRequest userRequest){
+        User updatedUser = userService.updateUser(id, userRequest);
         var response = new ApiResponse<User>(HttpStatus.OK, "User updated successfully", updatedUser, null);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

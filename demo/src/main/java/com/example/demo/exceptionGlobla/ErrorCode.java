@@ -3,8 +3,15 @@ package com.example.demo.exceptionGlobla;
 public enum ErrorCode {
     // Khai báo các hằng số enum trước, ví dụ:
     NOT_FOUND(404, "Not Found"),
-    INTERNAL_ERROR(500, "Internal Server Error");
-    
+    INTERNAL_ERROR(500, "Internal Server Error"),
+    BAD_REQUEST(400, "Bad Request"),
+    UNAUTHORIZED(401, "Unauthorized"),
+    FORBIDDEN(403, "Forbidden"),
+    NOT_ACCEPTABLE(406, "Not Acceptable"),
+    REQUEST_TIMEOUT(408, "Request Timeout"),
+    CONFLICT(409, "Conflict"),
+    GONE(410, "Gone"),
+    LENGTH_REQUIRED(411, "Length Required");
     private int code;
     private String message;
 

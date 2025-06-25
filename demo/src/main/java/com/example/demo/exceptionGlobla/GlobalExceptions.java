@@ -17,11 +17,18 @@ import com.example.demo.entity.ApiResponse;
 public class GlobalExceptions {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<?>> handleExceptionNotFound(Exception e){
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse<String>(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error", e.getMessage(), "ERR_INTERNAL_SERVER"));
+        // log the exception
+        ErrorCode errorCode = ErrorCode.INTERNAL_ERROR;
+        String message = e.getMessage();
+        HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+        return ResponseEntity.status(httpStatus).body(new ApiResponse<String>(httpStatus, message, message, errorCode.getMessage()));
     }
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<ApiResponse<?>> handleException(NoSuchElementException e){
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<String>(HttpStatus.NOT_FOUND, "User not found", e.getMessage(), "ERR_USER_NOT_FOUND"));
+        ErrorCode errorCode = ErrorCode.NOT_FOUND;
+        String message = e.getMessage();
+        HttpStatus httpStatus = HttpStatus.NOT_FOUND;
+        return ResponseEntity.status(httpStatus).body(new ApiResponse<String>(httpStatus, message, message, errorCode.getMessage()));
     }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<?>> handleException(MethodArgumentNotValidException exmethod){
@@ -33,5 +40,13 @@ public class GlobalExceptions {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiResponse<?>> handleException(IllegalArgumentException e){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<String>(HttpStatus.BAD_REQUEST, "Bad request", e.getMessage(), "ERR_BAD_REQUEST"));
+    }
+    @ExceptionHandler(AppExceptions.class)
+    public ResponseEntity<ApiResponse<?>> handleException(AppExceptions e){
+        ErrorCode errorCode = e.getErrorCode();
+        String code = String.valueOf(errorCode.getCode());
+        String message = e.getMessage();
+        HttpStatus httpStatus = HttpStatus.valueOf(errorCode.getCode());
+        return ResponseEntity.status(httpStatus).body(new ApiResponse<String>(httpStatus, message, message, code));
     }
 }

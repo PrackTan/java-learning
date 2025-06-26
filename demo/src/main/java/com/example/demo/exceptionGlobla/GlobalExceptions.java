@@ -1,5 +1,6 @@
 package com.example.demo.exceptionGlobla;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.example.demo.entity.ApiResponse;
+import com.nimbusds.jose.JOSEException;
 
 @RestControllerAdvice // this is a global exception handler
 public class GlobalExceptions {
@@ -48,5 +50,19 @@ public class GlobalExceptions {
         String message = e.getMessage();
         HttpStatus httpStatus = HttpStatus.valueOf(errorCode.getCode());
         return ResponseEntity.status(httpStatus).body(new ApiResponse<String>(httpStatus, message, message, code));
+    }
+    @ExceptionHandler(JOSEException.class)
+    public ResponseEntity<ApiResponse<?>> handleException(JOSEException e){
+        ErrorCode errorCode = ErrorCode.INTERNAL_ERROR;
+        String message = e.getMessage();
+        HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+        return ResponseEntity.status(httpStatus).body(new ApiResponse<String>(httpStatus, message, message, errorCode.getMessage()));
+    }
+    @ExceptionHandler(ParseException.class)
+    public ResponseEntity<ApiResponse<?>> handleException(ParseException e){
+        ErrorCode errorCode = ErrorCode.INTERNAL_ERROR;
+        String message = e.getMessage();
+        HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+        return ResponseEntity.status(httpStatus).body(new ApiResponse<String>(httpStatus, message, message, errorCode.getMessage()));
     }
 }

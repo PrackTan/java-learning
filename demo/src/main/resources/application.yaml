@@ -12,3 +12,6 @@ spring:
     show-sql: true
 server:
   port: 8084
+jwt:
+  secret-key: z/TqNp2f/oITNq/L4nwxTynQZH4uJyBCchuPfxyfMOKdsiAl8BBBNMaCI8ii8zYT
+  expiration-time: 3600000

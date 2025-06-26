@@ -11,7 +11,10 @@ public enum ErrorCode {
     REQUEST_TIMEOUT(408, "Request Timeout"),
     CONFLICT(409, "Conflict"),
     GONE(410, "Gone"),
-    LENGTH_REQUIRED(411, "Length Required");
+    LENGTH_REQUIRED(411, "Length Required"),
+    INVALID_CREDENTIALS(401, "Invalid Credentials"),
+    TOKEN_EXPIRED(401, "Token Expired"),
+    TOKEN_INVALID(401, "Token Invalid");
     private int code;
     private String message;
 

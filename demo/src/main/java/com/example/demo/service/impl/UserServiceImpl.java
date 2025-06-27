@@ -1,5 +1,6 @@
 package com.example.demo.service.impl;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -15,6 +16,7 @@ import lombok.experimental.FieldDefaults;
 import com.example.demo.DTO.Request.UserRequest;
 import com.example.demo.DTO.Reponse.UserReponse;
 import com.example.demo.entity.User;
+import com.example.demo.enums.Role;
 import com.example.demo.exceptionGlobla.ErrorCode;
 import com.example.demo.mapper.UserMapper;
 import com.example.demo.exceptionGlobla.AppExceptions;
@@ -27,6 +29,7 @@ import com.example.demo.service.UserService;
 public class UserServiceImpl implements UserService {
      UserRepository userRepository;
      UserMapper userMapper;
+     PasswordEncoder passwordEncoder;
     /// get all users
     public List<UserReponse> getAllUsers(){
         return userRepository.findAll().stream()
@@ -40,14 +43,16 @@ public class UserServiceImpl implements UserService {
     /// create user
     public User createUser(UserRequest userRequest) throws Exception
     {
-        if(userRepository.findByEmail(userRequest.getEmail()) != null)
+        if(userRepository.findByEmail(userRequest.getEmail()).isPresent())
         {
             throw new AppExceptions(ErrorCode.BAD_REQUEST, "Email already exists");
         }
         // convert UserRequest to User entity
         User newUser = userMapper.toEntity(userRequest);
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
         newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
+        HashSet<String> roles =  new HashSet<>();
+        roles.add(Role.USER.name());
+        newUser.setRoles(roles);
         return userRepository.save(newUser);
     }
     /// update user

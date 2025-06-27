@@ -3,17 +3,20 @@ package com.example.demo.service.impl;
 import java.text.ParseException;
 import java.time.Instant;
 import java.util.Date;
+import java.util.StringJoiner;
 import java.time.temporal.ChronoUnit;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.example.demo.DTO.Reponse.AuthenticationReponse;
 import com.example.demo.DTO.Reponse.IntrospectReponse;
 import com.example.demo.DTO.Request.AuthenticationRequest;
 import com.example.demo.DTO.Request.IntrospectRquest;
 import com.example.demo.config.JwtConfig;
+import com.example.demo.entity.User;
 import com.example.demo.exceptionGlobla.AppExceptions;
 import com.example.demo.exceptionGlobla.ErrorCode;
 import com.example.demo.reponsitory.UserRepository;
@@ -39,13 +42,12 @@ import lombok.experimental.FieldDefaults;
 public class AuthenticationImpl implements AuthenticationService {
     UserRepository userRepository;
     JwtConfig jwtConfig;
-    
+    PasswordEncoder passwordEncoder;
     @Override
     public boolean authenticate(AuthenticationRequest request) {
         var user = userRepository.findByEmail(request.getEmail())
             .orElseThrow(() -> new AppExceptions(ErrorCode.NOT_FOUND, "User not found"));
         
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
         // TODO: Add password validation logic here
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new AppExceptions(ErrorCode.INVALID_CREDENTIALS, "Invalid password");
@@ -58,15 +60,18 @@ public class AuthenticationImpl implements AuthenticationService {
         if(!authenticate(request)){
             throw new AppExceptions(ErrorCode.INVALID_CREDENTIALS, "Invalid credentials");
         }
-        String token = generateToken(request.getEmail());
+        var user = userRepository.findByEmail(request.getEmail())
+        .orElseThrow(() -> new AppExceptions(ErrorCode.NOT_FOUND, "User not found"));
+        String token = generateToken(user);
         return new AuthenticationReponse().builder().token(token).isAuthenticated(true).build();
     }
-    private String generateToken(String email){
+    private String generateToken(User user){
         JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-        .subject(email)
+        .subject(user.getEmail())
         .issuer("self")
         .issueTime(new Date())
+        .claim("scope", buildScope(user))
         .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
         .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
@@ -94,5 +99,14 @@ public class AuthenticationImpl implements AuthenticationService {
         } catch (ParseException e) {
             return new IntrospectReponse().builder().valid(false).build();
         }
+    }
+    // Hàm buildScope nhận vào một đối tượng User và trả về một chuỗi các vai trò (roles) của người dùng đó, được nối với nhau bằng dấu cách.
+    // Nếu người dùng có danh sách vai trò không rỗng, hàm sẽ duyệt qua từng vai trò và thêm vào chuỗi kết quả.
+    private String buildScope(User user){
+        StringJoiner stringJoiner = new StringJoiner(" "); 
+        if(!CollectionUtils.isEmpty(user.getRoles())){
+            user.getRoles().forEach(role -> stringJoiner.add(role));
+        }
+        return stringJoiner.toString();
     }
 }

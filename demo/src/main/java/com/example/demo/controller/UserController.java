@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +24,8 @@ import com.example.demo.entity.User;
 import com.example.demo.service.UserService;
 
 import jakarta.validation.Valid;
-
+import lombok.extern.log4j.Log4j2;
+@Log4j2
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -34,6 +36,8 @@ public class UserController {
     }
     @GetMapping("/user")
     public ResponseEntity<ApiResponse<List<UserReponse>>> getUsers(){
+        var authenticate = SecurityContextHolder.getContext().getAuthentication();
+        log.info("Authenticate: {}", authenticate.get);
         List<UserReponse> users = userService.getAllUsers();
         var response = new ApiResponse<List<UserReponse>>(HttpStatus.OK, "Users fetched successfully", users, null);
         return ResponseEntity.status(HttpStatus.OK).body(response);
